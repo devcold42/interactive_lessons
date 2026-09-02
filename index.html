@@ -8,8 +8,8 @@
     <style>
         :root {
             --bg-color: #030308;
-            --orbit-color: rgba(255, 255, 255, 0.15);
-            --orbit-hover: rgba(255, 255, 255, 0.6);
+            --orbit-color: rgba(255, 255, 255, 0.12);
+            --orbit-hover: rgba(255, 255, 255, 0.7);
         }
 
         body {
@@ -26,12 +26,11 @@
         /* Titles and Text */
         .ui-container {
             position: absolute;
-            top: 3vh;
+            top: 4vh;
             width: 100%;
             text-align: center;
             z-index: 200;
             pointer-events: none;
-            text-shadow: 0 0 10px #000, 0 0 20px #000;
         }
         
         h1 {
@@ -41,7 +40,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            filter: drop-shadow(0px 0px 15px rgba(229, 46, 113, 0.4));
         }
 
         p {
@@ -49,15 +49,7 @@
             font-size: 2vmin;
             color: #b3b3ff;
             font-weight: 700;
-        }
-
-        .credit {
-            position: absolute;
-            bottom: 10px;
-            right: 15px;
-            font-size: 1.2vmin;
-            color: rgba(255, 255, 255, 0.3);
-            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
         /* Starfield */
@@ -77,7 +69,7 @@
 
         @keyframes twinkle {
             0%, 100% { opacity: 0.1; box-shadow: none; }
-            50% { opacity: 1; box-shadow: 0 0 4px white; }
+            50% { opacity: 1; box-shadow: 0 0 6px white; }
         }
 
         /* System Container */
@@ -100,9 +92,8 @@
             height: var(--orbit-size);
             border: 1px dashed var(--orbit-color);
             border-radius: 50%;
-            /* Spin keyframes handle the translation to center it */
             animation: spin var(--speed) linear infinite;
-            pointer-events: none; /* Let hover pass through the bounding box */
+            pointer-events: none; 
             transition: border-color 0.4s, box-shadow 0.4s;
         }
 
@@ -113,9 +104,8 @@
             left: 50%;
             width: var(--size-w, var(--size));
             height: var(--size-h, var(--size));
-            /* Anti-spin keeps the images and names upright */
             animation: anti-spin var(--anti-speed) linear infinite;
-            pointer-events: auto; /* Enable hovering on planets */
+            pointer-events: auto; 
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -130,36 +120,37 @@
             background-position: center;
             background-repeat: no-repeat;
             border-radius: 50%;
-            /* Screen blend mode magically deletes the black backgrounds from NASA jpegs */
-            mix-blend-mode: screen; 
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s;
+            box-shadow: inset -4px -4px 10px rgba(0,0,0,0.8); /* Creates a realistic shadow on the dark side */
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
         }
 
+        /* Saturn specific fixes to remove the black box */
         .saturn .planet {
-            border-radius: 0;
-            background-size: contain;
+            background-size: 100% 100%;
+            box-shadow: none;
+            /* This pure CSS mask softly fades out the black edges of the JPEG, creating seamless transparency */
+            -webkit-mask-image: radial-gradient(ellipse at center, black 62%, transparent 72%);
+            mask-image: radial-gradient(ellipse at center, black 62%, transparent 72%);
         }
 
         /* Planet Names */
         .planet-name {
             position: absolute;
-            top: calc(100% + 5px);
-            background: rgba(0, 0, 0, 0.75);
-            color: white;
+            top: calc(100% + 8px);
+            color: #fff;
             padding: 4px 12px;
-            border-radius: 20px;
             font-size: 1.8vmin;
-            letter-spacing: 1px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 4px #000, 0 0 8px #000, 0 0 15px #9b2deb;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s, transform 0.3s;
             white-space: nowrap;
-            backdrop-filter: blur(4px);
         }
 
         /* Interactivity / Hover States */
-        /* 1. Pause the entire universe when ANY planet is hovered */
         body:has(.planet-wrapper:hover) .orbit,
         body:has(.planet-wrapper:hover) .planet-wrapper,
         body:has(.sun-wrapper:hover) .orbit,
@@ -167,30 +158,23 @@
             animation-play-state: paused;
         }
 
-        /* 2. Highlight the specific orbit being hovered */
         .orbit:has(.planet-wrapper:hover) {
             border-color: var(--orbit-hover);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1) inset, 0 0 20px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.15) inset, 0 0 25px rgba(255, 255, 255, 0.15);
         }
 
-        /* 3. Pop the planet up and show its name */
         .planet-wrapper:hover, .sun-wrapper:hover {
             z-index: 100;
         }
 
         .planet-wrapper:hover .planet, .sun-wrapper:hover .planet {
             transform: scale(1.6);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-        }
-
-        .saturn-wrapper:hover .planet {
-            box-shadow: none; /* Shadow looks weird on Saturn's rectangle */
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
         }
 
         .planet-wrapper:hover .planet-name, .sun-wrapper:hover .planet-name {
             opacity: 1;
-            transform: translateY(8px);
+            transform: translateY(5px);
         }
 
         /* Animations */
@@ -205,7 +189,6 @@
         }
 
         /* ==== CELESTIAL BODIES DATA ==== */
-        /* Sun */
         .sun-wrapper {
             position: absolute;
             top: 50%; left: 50%;
@@ -218,50 +201,42 @@
         }
         .sun {
             background-image: url('https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg');
-            box-shadow: 0 0 30px #ff7300, 0 0 80px #ff2a00 inset;
+            box-shadow: 0 0 40px #ff7300, 0 0 80px #ff2a00 inset;
             border-radius: 50%;
         }
 
-        /* Mercury */
-        .mercury-orbit { --orbit-size: 18vmin; --speed: 8s; z-index: 9; }
+        .mercury-orbit { --orbit-size: 19vmin; --speed: 8s; z-index: 9; }
         .mercury-wrapper { --size: 2vmin; --anti-speed: 8s; }
         .mercury .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/30/Mercury_in_color_-_Prockter07_centered.jpg'); }
 
-        /* Venus */
-        .venus-orbit { --orbit-size: 27vmin; --speed: 12s; z-index: 8; }
+        .venus-orbit { --orbit-size: 28vmin; --speed: 12s; z-index: 8; }
         .venus-wrapper { --size: 3.5vmin; --anti-speed: 12s; }
-        .venus .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a9/PIA23791-Venus-RealAndEnhancedContrastViews-20200608_%28cropped2%29.jpg'); }
+        .venus .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg'); } /* Fixed Venus URL! */
 
-        /* Earth & Moon */
-        .earth-orbit { --orbit-size: 38vmin; --speed: 16s; z-index: 7; }
+        .earth-orbit { --orbit-size: 39vmin; --speed: 16s; z-index: 7; }
         .earth-wrapper { --size: 4vmin; --anti-speed: 16s; }
         .earth .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg'); }
 
         .moon-orbit { --orbit-size: 7vmin; --speed: 3s; border-color: rgba(255,255,255,0.05); }
-        .moon-wrapper { --size: 1vmin; --anti-speed: 3s; }
-        .moon .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg'); }
+        .moon-wrapper { --size: 1.2vmin; --anti-speed: 3s; }
+        .moon .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg'); box-shadow: none; }
 
-        /* Mars */
-        .mars-orbit { --orbit-size: 49vmin; --speed: 24s; z-index: 6; }
+        .mars-orbit { --orbit-size: 50vmin; --speed: 24s; z-index: 6; }
         .mars-wrapper { --size: 3vmin; --anti-speed: 24s; }
         .mars .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg'); }
 
-        /* Jupiter */
-        .jupiter-orbit { --orbit-size: 64vmin; --speed: 36s; z-index: 5; }
+        .jupiter-orbit { --orbit-size: 65vmin; --speed: 36s; z-index: 5; }
         .jupiter-wrapper { --size: 7vmin; --anti-speed: 36s; }
         .jupiter .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg'); }
 
-        /* Saturn */
-        .saturn-orbit { --orbit-size: 78vmin; --speed: 48s; z-index: 4; }
-        .saturn-wrapper { --size-w: 11vmin; --size-h: 5.5vmin; --anti-speed: 48s; }
+        .saturn-orbit { --orbit-size: 79vmin; --speed: 48s; z-index: 4; }
+        .saturn-wrapper { --size-w: 12vmin; --size-h: 6vmin; --anti-speed: 48s; }
         .saturn .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg'); }
 
-        /* Uranus */
         .uranus-orbit { --orbit-size: 89vmin; --speed: 60s; z-index: 3; }
         .uranus-wrapper { --size: 4.5vmin; --anti-speed: 60s; }
         .uranus .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg'); }
 
-        /* Neptune */
         .neptune-orbit { --orbit-size: 98vmin; --speed: 76s; z-index: 2; }
         .neptune-wrapper { --size: 4vmin; --anti-speed: 76s; }
         .neptune .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg'); }
@@ -275,8 +250,6 @@
         <h1>Our Solar System</h1>
         <p>Hover over the planets to stop time!</p>
     </div>
-
-    <div class="credit">Images: NASA / JPL / SDO</div>
 
     <div class="solar-system">
         
@@ -306,7 +279,7 @@
                 <div class="orbit moon-orbit">
                     <div class="planet-wrapper moon-wrapper moon">
                         <div class="planet"></div>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -349,24 +322,20 @@
     </div>
 
     <script>
-        // Generate a beautiful random starry background
         const universe = document.getElementById('universe');
-        const starCount = 300;
+        const starCount = 350;
 
         for (let i = 0; i < starCount; i++) {
             let star = document.createElement('div');
             star.className = 'star';
             
-            // Random positioning across the viewport
             star.style.left = Math.random() * 100 + 'vw';
             star.style.top = Math.random() * 100 + 'vh';
             
-            // Randomize star size
             let size = Math.random() * 2 + 1;
             star.style.width = size + 'px';
             star.style.height = size + 'px';
             
-            // Randomize the twinkle animation speed and start time
             star.style.animationDuration = (Math.random() * 4 + 2) + 's';
             star.style.animationDelay = (Math.random() * 5) + 's';
             
