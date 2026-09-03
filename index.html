@@ -1,343 +1,989 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explore Our Solar System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    <title>🚀 Solar System Superstars - Interactive Learning Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        space: {
+                            900: '#0B0D1B',
+                            800: '#12162D',
+                            700: '#1A203E',
+                            accent: '#6366F1',
+                            sun: '#FBBF24',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root {
-            --bg-color: #030308;
-            --orbit-color: rgba(255, 255, 255, 0.12);
-            --orbit-hover: rgba(255, 255, 255, 0.8);
-        }
-
         body {
-            margin: 0;
-            padding: 0;
-            background: radial-gradient(circle at center, #0a0a1a 0%, var(--bg-color) 100%);
-            color: white;
-            font-family: 'Nunito', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0D1B;
+            color: #F3F4F6;
+            overflow-x: hidden;
         }
-
-        /* Titles and Text */
-        .ui-container {
-            position: absolute;
-            top: 4vh;
-            width: 100%;
-            text-align: center;
-            z-index: 200;
-            pointer-events: none;
+        .font-display {
+            font-family: 'Outfit', sans-serif;
         }
-        
-        h1 {
-            margin: 0;
-            font-size: 5vmin;
-            background: linear-gradient(90deg, #ff8a00, #e52e71, #9b2deb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            filter: drop-shadow(0px 0px 15px rgba(229, 46, 113, 0.4));
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        p {
-            margin: 8px 0 0 0;
-            font-size: 2vmin;
-            color: #b3b3ff;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* Starfield */
-        #universe {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
+        .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 12px 30px -10px rgba(99, 102, 241, 0.3);
         }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle linear infinite;
+        /* Custom Glowing effects */
+        .glow-sun {
+            box-shadow: 0 0 50px rgba(251, 191, 36, 0.6);
         }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.1; }
-            50% { opacity: 0.9; }
+        .glow-blue {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
         }
-
-        /* System Container */
-        .solar-system {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 95vmin;
-            height: 95vmin;
-            transform: translate(-50%, -50%);
-            z-index: 10;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        /* Orbits */
-        .orbit {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: var(--orbit-size);
-            height: var(--orbit-size);
-            border: 1px dashed var(--orbit-color);
-            border-radius: 50%;
-            animation: spin var(--speed) linear infinite;
-            will-change: transform;
-            transition: border-color 0.3s;
+        ::-webkit-scrollbar-track {
+            background: #0B0D1B;
         }
-
-        .orbit:hover {
-            border-color: var(--orbit-hover);
-            animation-play-state: paused !important;
+        ::-webkit-scrollbar-thumb {
+            background: #1A203E;
+            border-radius: 4px;
         }
-
-        .orbit:hover .planet-wrapper {
-            animation-play-state: paused !important;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366F1;
         }
-
-        /* Planet Wrappers */
-        .planet-wrapper {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: var(--size-w, var(--size));
-            height: var(--size-h, var(--size));
-            animation: anti-spin var(--anti-speed) linear infinite;
-            will-change: transform;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* The Planet Images */
-        .planet {
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            border-radius: 50%;
-            box-shadow: inset -4px -4px 10px rgba(0,0,0,0.8);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
-        }
-
-        /* Saturn specific mask to blend black frame seamlessly */
-        .saturn .planet {
-            background-size: cover;
-            box-shadow: none;
-            border-radius: 0;
-            -webkit-mask-image: radial-gradient(ellipse 55% 65% at center, #000 50%, transparent 72%);
-            mask-image: radial-gradient(ellipse 55% 65% at center, #000 50%, transparent 72%);
-        }
-
-        /* Planet Names */
-        .planet-name {
-            position: absolute;
-            top: calc(100% + 8px);
-            color: #fff;
-            padding: 4px 12px;
-            font-size: 1.8vmin;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 4px #000, 0 0 8px #000, 0 0 15px #9b2deb;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s, transform 0.3s;
-            white-space: nowrap;
-        }
-
-        /* Interactivity / Hover States */
-        .planet-wrapper:hover, .sun-wrapper:hover {
-            z-index: 100;
-        }
-
-        .planet-wrapper:hover .planet, .sun-wrapper:hover .planet {
-            transform: scale(1.6);
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
-        }
-
-        .planet-wrapper:hover .planet-name, .sun-wrapper:hover .planet-name {
-            opacity: 1;
-            transform: translateY(5px);
-        }
-
-        /* Animations */
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        @keyframes anti-spin {
-            0% { transform: translate(-50%, -50%) rotate(360deg); }
-            100% { transform: translate(-50%, -50%) rotate(0deg); }
-        }
-
-        /* ==== CELESTIAL BODIES DATA ==== */
-        .sun-wrapper {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 12vmin; height: 12vmin;
-            cursor: pointer;
-            z-index: 20;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .sun {
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg');
-            box-shadow: 0 0 40px #ff7300, 0 0 80px #ff2a00 inset;
-            border-radius: 50%;
-        }
-
-        .mercury-orbit { --orbit-size: 19vmin; --speed: 10s; z-index: 9; }
-        .mercury-wrapper { --size: 2vmin; --anti-speed: 10s; }
-        .mercury .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/30/Mercury_in_color_-_Prockter07_centered.jpg'); }
-
-        .venus-orbit { --orbit-size: 28vmin; --speed: 15s; z-index: 8; }
-        .venus-wrapper { --size: 3.5vmin; --anti-speed: 15s; }
-        .venus .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e5/Venus-real_color.jpg'); }
-
-        .earth-orbit { --orbit-size: 39vmin; --speed: 20s; z-index: 7; }
-        .earth-wrapper { --size: 4vmin; --anti-speed: 20s; }
-        .earth .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg'); }
-
-        .moon-orbit { --orbit-size: 7vmin; --speed: 4s; border-color: rgba(255,255,255,0.05); }
-        .moon-wrapper { --size: 1.2vmin; --anti-speed: 4s; }
-        .moon .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg'); box-shadow: none; }
-
-        .mars-orbit { --orbit-size: 50vmin; --speed: 30s; z-index: 6; }
-        .mars-wrapper { --size: 3vmin; --anti-speed: 30s; }
-        .mars .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg'); }
-
-        .jupiter-orbit { --orbit-size: 65vmin; --speed: 45s; z-index: 5; }
-        .jupiter-wrapper { --size: 7vmin; --anti-speed: 45s; }
-        .jupiter .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e2/Jupiter.jpg'); }
-
-        .saturn-orbit { --orbit-size: 79vmin; --speed: 60s; z-index: 4; }
-        .saturn-wrapper { --size-w: 13vmin; --size-h: 6.5vmin; --anti-speed: 60s; }
-        .saturn .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg'); }
-
-        .uranus-orbit { --orbit-size: 89vmin; --speed: 75s; z-index: 3; }
-        .uranus-wrapper { --size: 4.5vmin; --anti-speed: 75s; }
-        .uranus .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg'); }
-
-        .neptune-orbit { --orbit-size: 98vmin; --speed: 90s; z-index: 2; }
-        .neptune-wrapper { --size: 4vmin; --anti-speed: 90s; }
-        .neptune .planet { background-image: url('https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg'); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
 
-    <div id="universe"></div>
-    
-    <div class="ui-container">
-        <h1>Our Solar System</h1>
-        <p>Hover over any orbit to freeze time and inspect!</p>
-    </div>
-
-    <div class="solar-system">
-        
-        <div class="sun-wrapper">
-            <div class="planet sun"></div>
-            <div class="planet-name">The Sun</div>
-        </div>
-
-        <div class="orbit mercury-orbit">
-            <div class="planet-wrapper mercury-wrapper mercury">
-                <div class="planet"></div>
-                <div class="planet-name">Mercury</div>
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-800 bg-space-900/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <i class="fa-solid fa-sun text-slate-900 text-xl animate-spin-slow"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-black text-xl bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-orange-400 to-indigo-400">
+                        SOLAR SYSTEM SUPERSTARS
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium hidden sm:block">Interactive Space Learning Experience</p>
+                </div>
             </div>
-        </div>
 
-        <div class="orbit venus-orbit">
-            <div class="planet-wrapper venus-wrapper venus">
-                <div class="planet"></div>
-                <div class="planet-name">Venus</div>
+            <!-- Navigation Links -->
+            <nav class="flex items-center space-x-2 sm:space-x-4 text-xs sm:text-sm font-semibold">
+                <a href="#visualizer" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition">
+                    <i class="fa-solid fa-orbit mr-1 text-indigo-400"></i> Orbits
+                </a>
+                <a href="#comparisons" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition">
+                    <i class="fa-solid fa-wind mr-1 text-cyan-400"></i> Mind-Blowers
+                </a>
+                <a href="#planets" class="px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white transition">
+                    <i class="fa-solid fa-globe mr-1 text-emerald-400"></i> Planets
+                </a>
+                <a href="#quiz" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-circle-question mr-1"></i> Space Quiz
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow space-y-12 py-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+
+        <section id="visualizer" class="glass-card rounded-3xl p-4 sm:p-6 relative overflow-hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 z-10 relative">
+                <div>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-2">
+                        <i class="fa-solid fa-bolt mr-1.5"></i> Live Orbit Simulator
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-display font-black text-white">The Sun & The 8 Travelers</h2>
+                    <p class="text-sm text-slate-400">Click on any celestial body or control speed below!</p>
+                </div>
+
+                <!-- Simulation Controls -->
+                <div class="flex flex-wrap items-center gap-3 bg-space-800/80 p-2 rounded-2xl border border-slate-700/60">
+                    <button id="btn-pause" onclick="toggleOrbitAnimation()" class="px-3 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-pause" id="pause-icon"></i> <span id="pause-text">Pause</span>
+                    </button>
+                    <div class="flex items-center gap-2 px-2">
+                        <label for="speed-range" class="text-xs font-medium text-slate-400">Speed:</label>
+                        <input id="speed-range" type="range" min="0.1" max="3" step="0.1" value="1" oninput="setOrbitSpeed(this.value)" class="w-24 accent-indigo-500 cursor-pointer">
+                    </div>
+                    <button onclick="resetOrbitView()" class="px-3 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 text-xs font-semibold transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> Reset
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <div class="orbit earth-orbit">
-            <div class="planet-wrapper earth-wrapper earth">
-                <div class="planet"></div>
-                <div class="planet-name">Earth</div>
-                <div class="orbit moon-orbit">
-                    <div class="planet-wrapper moon-wrapper moon">
-                        <div class="planet"></div>
+            <!-- Canvas Container -->
+            <div class="relative w-full h-[380px] sm:h-[480px] rounded-2xl bg-space-900 border border-slate-800/80 overflow-hidden flex items-center justify-center">
+                <canvas id="spaceCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                
+                <!-- Floating Info Card (On Canvas Selection) -->
+                <div id="canvas-planet-tooltip" class="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 glass-card p-4 rounded-2xl hidden border-indigo-500/30 transition-all duration-300 z-20">
+                    <div class="flex items-center justify-between mb-1">
+                        <h4 id="tooltip-title" class="font-display font-bold text-lg text-amber-400">Planet Name</h4>
+                        <span id="tooltip-tag" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-300">Rocky</span>
+                    </div>
+                    <p id="tooltip-desc" class="text-xs text-slate-300 leading-relaxed mb-3">Description here...</p>
+                    <button id="tooltip-btn" class="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition">
+                        Inspect Planet Details <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparisons" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <!-- Tool 1: Neptune's 2,000 km/h Wind Simulator -->
+            <div class="glass-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                            <i class="fa-solid fa-wind mr-1.5"></i> Super Wind Comparison
+                        </span>
+                        <span class="text-xs text-cyan-300 font-mono">NEPTUNE: 2,000 KM/H</span>
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-display font-bold text-white mb-2">How Fast is Neptune's Storm?</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+                        Neptune has the wild winds in the solar system (**2,000 km/h**). Kids often can't imagine this speed—drag the slider below to see how it destroys Earth's wildest weather!
+                    </p>
+
+                    <!-- Interactive Speed Slider -->
+                    <div class="space-y-4 bg-space-800/60 p-4 rounded-2xl border border-slate-700/50 mb-6">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold uppercase text-slate-400">Compare Speed Source:</label>
+                            <span id="speed-label-val" class="font-display font-black text-cyan-400 text-lg">Cat 5 Hurricane (280 km/h)</span>
+                        </div>
+                        <input id="wind-slider" type="range" min="1" max="5" value="1" step="1" oninput="updateWindComparison(this.value)" class="w-full accent-cyan-400 cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-slate-500 font-semibold px-1">
+                            <span>Category 5</span>
+                            <span>F5 Tornado</span>
+                            <span>Bullet Train</span>
+                            <span>Fighter Jet</span>
+                            <span>NEPTUNE!</span>
+                        </div>
+                    </div>
+
+                    <!-- Speed Graphic Card -->
+                    <div id="wind-graphic-box" class="p-4 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-2xl flex-shrink-0" id="wind-icon-box">
+                            <i class="fa-solid fa-hurricane"></i>
+                        </div>
+                        <div>
+                            <h4 id="wind-title" class="font-display font-bold text-white text-base">Category 5 Hurricane (Earth)</h4>
+                            <p id="wind-speed" class="text-xs text-cyan-400 font-mono font-bold">~280 km/h</p>
+                            <p id="wind-desc" class="text-xs text-slate-300 mt-1">Destroys buildings on Earth, but Neptune's winds are <span class="text-cyan-300 font-bold">7 TIMES FASTER</span> than this!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Sprint Button -->
+                <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+                    <div>
+                        <span class="text-xs font-bold text-slate-300">Class Activity:</span>
+                        <p class="text-[11px] text-slate-400">Run in place as fast as you can matching Neptune's winds!</p>
+                    </div>
+                    <button onclick="triggerHurricaneSprint()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-cyan-600/30 transition flex items-center gap-2">
+                        <i class="fa-solid fa-person-running text-base animate-bounce"></i> Sprint Simulator
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tool 2: Trillions of Suns & Star Size Scale -->
+            <div class="glass-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <i class="fa-solid fa-star mr-1.5"></i> Cosmic Mind-Blower
+                        </span>
+                        <span class="text-xs text-amber-300 font-mono">100 BILLION TRILLION SUNS</span>
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-display font-bold text-white mb-2">Is Our Sun the Biggest?</h3>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+                        Our Sun is the biggest body in <span class="text-amber-300 font-bold">our solar system</span> (1 million Earths fit inside!), but in deep space, it's just an average star!
+                    </p>
+
+                    <!-- Interactive Sun vs Giant Star Comparison Visual -->
+                    <div class="bg-space-800/60 p-4 rounded-2xl border border-slate-700/50 mb-6 space-y-3">
+                        <div class="flex justify-between text-xs text-slate-300 font-semibold mb-2">
+                            <span>Visual Scale Comparison:</span>
+                            <span id="star-scale-name" class="text-amber-400 font-bold">Earth vs. Our Sun</span>
+                        </div>
+
+                        <!-- Visual Canvas Box -->
+                        <div class="h-32 rounded-xl bg-space-900 border border-slate-800 flex items-center justify-center relative overflow-hidden p-4" id="star-visual-container">
+                            <div id="star-obj-left" class="w-2 h-2 rounded-full bg-blue-400 transition-all duration-500 flex items-center justify-center text-[8px] font-bold text-white"></div>
+                            <div class="text-xs font-bold text-slate-500 mx-4">vs</div>
+                            <div id="star-obj-right" class="w-16 h-16 rounded-full bg-amber-400 glow-sun transition-all duration-500 flex items-center justify-center text-xs font-bold text-slate-900">
+                                Sun
+                            </div>
+                        </div>
+
+                        <!-- Toggle Controls -->
+                        <div class="grid grid-cols-2 gap-2 pt-2">
+                            <button onclick="setStarComparison('earth-sun')" id="btn-scale-1" class="py-1.5 px-3 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold transition">
+                                🌍 Earth vs Our Sun
+                            </button>
+                            <button onclick="setStarComparison('sun-monster')" id="btn-scale-2" class="py-1.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">
+                                ☀️ Our Sun vs Supergiant Star
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trillions of Stars Fact Banner -->
+                <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+                    <div class="text-2xl text-amber-400"><i class="fa-solid fa-sparkles"></i></div>
+                    <p class="text-xs text-slate-300 leading-tight">
+                        Almost every twinkling star you see at night is another <span class="text-amber-300 font-bold">"Sun"</span> out in space! There are over <span class="text-amber-300 font-bold">100,000,000,000,000,000,000,000</span> of them!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="planets" class="space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
+                <div>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-2">
+                        <i class="fa-solid fa-book-open mr-1.5"></i> Planet Library
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-display font-black text-white">Explore All 8 Planets</h2>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex gap-2">
+                    <button onclick="filterPlanets('all')" id="filter-all" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold transition">All 8</button>
+                    <button onclick="filterPlanets('rocky')" id="filter-rocky" class="px-3 py-1.5 rounded-xl bg-space-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">🪨 Rocky Inner (4)</button>
+                    <button onclick="filterPlanets('gas')" id="filter-gas" class="px-3 py-1.5 rounded-xl bg-space-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition">💨 Gas Giants (4)</button>
+                </div>
+            </div>
+
+            <!-- Mnemonic Banner -->
+            <div class="glass-card p-4 rounded-2xl border-indigo-500/30 flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-r from-indigo-950/40 via-space-800 to-purple-950/40">
+                <div class="space-y-1 text-center md:text-left">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Memory Trick Mnemonic (Order from Sun)</span>
+                    <p class="font-display font-bold text-base sm:text-lg text-white">
+                        "🇬🇧 <span class="text-amber-400">M</span>y <span class="text-yellow-300">V</span>ery <span class="text-blue-400">E</span>ntertaining <span class="text-red-400">M</span>other <span class="text-orange-400">J</span>ust <span class="text-amber-200">S</span>erved <span class="text-cyan-300">U</span>s <span class="text-blue-500">N</span>uggets!"
+                    </p>
+                    <p class="text-xs text-slate-400">
+                        🇻🇳 Vietnamese: <span class="text-slate-300">"Mẹ Việt Đang Mua Jơ-le Sau Ước Nhẹ!"</span>
+                    </p>
+                </div>
+                <button onclick="speakMnemonic()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition flex-shrink-0">
+                    <i class="fa-solid fa-volume-high"></i> Chant Mnemonic
+                </button>
+            </div>
+
+            <!-- Planets Card Grid -->
+            <div id="planets-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Javascript will dynamically render planet cards here -->
+            </div>
+        </section>
+
+        <section id="quiz" class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden bg-gradient-to-b from-space-800 to-space-900 border-indigo-500/30">
+            <div class="max-w-2xl mx-auto text-center space-y-4 mb-8">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <i class="fa-solid fa-trophy mr-1.5"></i> Fast-Fire Knowledge Check
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-display font-black text-white">Superstar Space Quiz!</h2>
+                <p class="text-xs sm:text-sm text-slate-300">Test your cosmic knowledge! Can you get a perfect 6/6 score?</p>
+            </div>
+
+            <!-- Quiz Box Container -->
+            <div class="max-w-xl mx-auto glass-card p-6 rounded-2xl border-slate-700/80 space-y-6 relative">
+                
+                <!-- Progress Header -->
+                <div class="flex justify-between items-center text-xs font-bold text-slate-400 pb-3 border-b border-slate-800">
+                    <span>Question <span id="quiz-current-num" class="text-indigo-400">1</span> of 6</span>
+                    <span>Score: <span id="quiz-score" class="text-emerald-400">0</span></span>
+                </div>
+
+                <!-- Question Text -->
+                <div id="quiz-card-content" class="min-h-[120px] flex flex-col justify-center text-center space-y-3">
+                    <h3 id="quiz-question-text" class="text-lg sm:text-xl font-display font-bold text-white leading-snug">
+                        Does the Sun fly around the Earth?
+                    </h3>
+                </div>
+
+                <!-- True / False Buttons -->
+                <div id="quiz-actions" class="grid grid-cols-2 gap-4">
+                    <button onclick="answerQuiz(true)" class="py-3 px-4 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-300 font-display font-bold text-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> TRUE
+                    </button>
+                    <button onclick="answerQuiz(false)" class="py-3 px-4 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/40 text-rose-300 font-display font-bold text-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-circle-xmark"></i> FALSE
+                    </button>
+                </div>
+
+                <!-- Feedback Banner -->
+                <div id="quiz-feedback" class="hidden p-4 rounded-xl text-center text-xs font-semibold leading-relaxed border transition-all">
+                    <!-- Dynamic feedback injected by JS -->
+                </div>
+
+                <!-- Next Question Button -->
+                <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-sm transition">
+                    Next Question <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="planet-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 transition-all duration-300">
+        <div class="glass-card max-w-2xl w-full rounded-3xl p-6 sm:p-8 border-indigo-500/30 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closePlanetModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                <!-- Modal Planet SVG Illustration -->
+                <div id="modal-planet-svg" class="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 flex items-center justify-center">
+                    <!-- SVG injected dynamically -->
+                </div>
+
+                <div class="space-y-3 text-center sm:text-left flex-grow">
+                    <div class="flex items-center justify-center sm:justify-start gap-2">
+                        <h3 id="modal-planet-name" class="font-display font-black text-2xl sm:text-3xl text-white">Planet Name</h3>
+                        <span id="modal-planet-type" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Type</span>
+                    </div>
+
+                    <p id="modal-planet-superpower" class="text-xs sm:text-sm text-indigo-300 font-semibold italic">Superpower highlight here...</p>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-xs py-2">
+                        <div class="bg-space-800/80 p-2.5 rounded-xl border border-slate-700/60">
+                            <span class="text-slate-400 block text-[10px]">Temperature</span>
+                            <span id="modal-planet-temp" class="font-bold text-amber-400">0°C</span>
+                        </div>
+                        <div class="bg-space-800/80 p-2.5 rounded-xl border border-slate-700/60">
+                            <span class="text-slate-400 block text-[10px]">Moons Count</span>
+                            <span id="modal-planet-moons" class="font-bold text-cyan-400">0 Moons</span>
+                        </div>
+                    </div>
+
+                    <p id="modal-planet-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed">Full description of planet characteristics and key features.</p>
+
+                    <!-- Interactive Activity Box inside Modal -->
+                    <div class="p-3 bg-indigo-950/30 border border-indigo-500/20 rounded-2xl text-xs space-y-1 text-left">
+                        <span class="font-bold text-indigo-400 uppercase text-[10px]"><i class="fa-solid fa-gamepad mr-1"></i> Class Activity:</span>
+                        <p id="modal-planet-activity" class="text-slate-300">Fun class activity description.</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="orbit mars-orbit">
-            <div class="planet-wrapper mars-wrapper mars">
-                <div class="planet"></div>
-                <div class="planet-name">Mars</div>
-            </div>
-        </div>
-
-        <div class="orbit jupiter-orbit">
-            <div class="planet-wrapper jupiter-wrapper jupiter">
-                <div class="planet"></div>
-                <div class="planet-name">Jupiter</div>
-            </div>
-        </div>
-
-        <div class="orbit saturn-orbit">
-            <div class="planet-wrapper saturn-wrapper saturn">
-                <div class="planet"></div>
-                <div class="planet-name">Saturn</div>
-            </div>
-        </div>
-
-        <div class="orbit uranus-orbit">
-            <div class="planet-wrapper uranus-wrapper uranus">
-                <div class="planet"></div>
-                <div class="planet-name">Uranus</div>
-            </div>
-        </div>
-
-        <div class="orbit neptune-orbit">
-            <div class="planet-wrapper neptune-wrapper neptune">
-                <div class="planet"></div>
-                <div class="planet-name">Neptune</div>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        const universe = document.getElementById('universe');
-        const starCount = 90; // Optimized count for smooth 60fps performance
+    <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 glass-card">
+        <p>🚀 <strong>Solar System Superstars</strong> — Created for Interactive ESL & Science Learning.</p>
+    </footer>
 
-        for (let i = 0; i < starCount; i++) {
-            let star = document.createElement('div');
-            star.className = 'star';
-            
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
-            
-            let size = Math.random() * 2 + 1;
-            star.style.width = size + 'px';
-            star.style.height = size + 'px';
-            
-            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            star.style.animationDelay = (Math.random() * 5) + 's';
-            
-            universe.appendChild(star);
+    <script>
+        const PLANETS_DATA = [
+            {
+                id: 'sun',
+                name: 'The Sun ☀️',
+                type: 'Star (Center)',
+                category: 'star',
+                color: '#FBBF24',
+                sizeRadius: 32,
+                orbitRadius: 0,
+                speed: 0,
+                temp: '5,500°C (Surface)',
+                moons: '8 Planets Orbit It',
+                superpower: 'The Giant Glowing Center of Everything!',
+                desc: 'A giant ball of hot fire and gas that sits in the center of our solar system. It gives us all light & heat. Over 1 MILLION Earths could fit inside it!',
+                activity: 'Sun & Earth Demo: Stand in the center holding a yellow ball while Earth orbits you!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_20px_rgba(251,191,36,0.8)]"><circle cx="50" cy="50" r="35" fill="#FBBF24"/><circle cx="50" cy="50" r="42" fill="none" stroke="#F59E0B" stroke-width="3" stroke-dasharray="4 4" class="animate-spin-slow"/></svg>`
+            },
+            {
+                id: 'mercury',
+                name: 'Mercury',
+                vnName: 'Thủy Tinh',
+                type: 'Rocky Inner',
+                category: 'rocky',
+                color: '#A1A1AA',
+                sizeRadius: 5,
+                orbitRadius: 55,
+                speed: 0.04,
+                temp: '-180°C to 430°C',
+                moons: '0 Moons',
+                superpower: 'Super Fast Speed & Extreme Temperatures!',
+                desc: 'The closest planet to the Sun! It flies around the Sun in just 88 days. It freezes cold at night (-180°C) and boils hot by day (430°C).',
+                activity: 'Cold-Hot Freeze: Shiver when facing away from the Sun, wipe sweat when facing toward it!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="30" fill="#9CA3AF"/><circle cx="40" cy="40" r="8" fill="#6B7280" opacity="0.5"/><circle cx="65" cy="60" r="10" fill="#6B7280" opacity="0.4"/></svg>`
+            },
+            {
+                id: 'venus',
+                name: 'Venus',
+                vnName: 'Kim Tinh',
+                type: 'Rocky Inner',
+                category: 'rocky',
+                color: '#FBBF24',
+                sizeRadius: 8,
+                orbitRadius: 80,
+                speed: 0.03,
+                temp: '465°C (Hottest!)',
+                moons: '0 Moons',
+                superpower: 'The Hottest Blanket Cloud Planet!',
+                desc: 'The hottest planet in our solar system (465°C)! Thick clouds trap heat like a giant greenhouse blanket.',
+                activity: 'Heat Blanket Hug: Hug yourself tightly like Venus trapping scorching heat!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="32" fill="#F59E0B"/><path d="M 20 40 Q 50 20 80 40 Q 50 60 20 40" fill="#FBBF24" opacity="0.6"/></svg>`
+            },
+            {
+                id: 'earth',
+                name: 'Earth',
+                vnName: 'Trái Đất',
+                type: 'Rocky Inner (Home)',
+                category: 'rocky',
+                color: '#3B82F6',
+                sizeRadius: 9,
+                orbitRadius: 110,
+                speed: 0.022,
+                temp: '15°C (Average)',
+                moons: '1 Moon 🌕',
+                superpower: 'Water, Air & Life Oasis!',
+                desc: 'Our beautiful home world! The only planet with liquid water oceans, oxygen to breathe, and living creatures.',
+                activity: 'Spin & Orbit Walk: Walk in a circle around the Sun while spinning around in place for Daytime & Nighttime!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="34" fill="#2563EB"/><path d="M 30 35 Q 45 25 55 40 T 70 65 Q 40 75 30 50 Z" fill="#10B981"/><circle cx="80" cy="25" r="4" fill="#E5E7EB"/></svg>`
+            },
+            {
+                id: 'mars',
+                name: 'Mars',
+                vnName: 'Hỏa Tinh',
+                type: 'Rocky Inner',
+                category: 'rocky',
+                color: '#EF4444',
+                sizeRadius: 7,
+                orbitRadius: 140,
+                speed: 0.018,
+                temp: '-63°C (Freezing Cold)',
+                moons: '2 Moons',
+                superpower: 'Giant Volcano Olympus Mons!',
+                desc: 'The Red Planet! It is covered in rusty iron dust and houses Olympus Mons—a volcano 3 TIMES taller than Mount Everest!',
+                activity: 'Volcano Jump: Crouch low and jump as high as you can to reach the peak of Olympus Mons!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="30" fill="#DC2626"/><circle cx="45" cy="45" r="12" fill="#991B1B"/><polygon points="45,35 40,50 50,50" fill="#7F1D1D"/></svg>`
+            },
+            {
+                id: 'jupiter',
+                name: 'Jupiter',
+                vnName: 'Mộc Tinh',
+                type: 'Gas Giant',
+                category: 'gas',
+                color: '#F97316',
+                sizeRadius: 22,
+                orbitRadius: 180,
+                speed: 0.012,
+                temp: '-110°C',
+                moons: '95+ Moons',
+                superpower: 'The Great Red Spot Storm!',
+                desc: 'The biggest planet of all! Made entirely of gas (no solid ground). Its Great Red Spot is a giant storm bigger than Earth that has raged for centuries!',
+                activity: 'Jupiter Storm Spinner: Spin around with arms open wide like Jupiter’s Great Red Spot storm!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="38" fill="#EA580C"/><rect x="12" y="38" width="76" height="8" rx="4" fill="#FDBA74" opacity="0.7"/><rect x="15" y="54" width="70" height="6" rx="3" fill="#FED7AA" opacity="0.6"/><ellipse cx="65" cy="62" rx="9" ry="6" fill="#991B1B"/></svg>`
+            },
+            {
+                id: 'saturn',
+                name: 'Saturn',
+                vnName: 'Thổ Tinh',
+                type: 'Gas Giant',
+                category: 'gas',
+                color: '#FDE047',
+                sizeRadius: 18,
+                orbitRadius: 225,
+                speed: 0.009,
+                temp: '-140°C',
+                moons: '145+ Moons',
+                superpower: 'Majestic Ice & Rock Rings!',
+                desc: 'Famous for its dazzling giant rings made of billions of pieces of ice, dust, and rock floating in space!',
+                activity: 'Hula Ring Pose: Spin your hips like Saturn spinning inside its glowing rings!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><ellipse cx="50" cy="50" rx="46" ry="12" fill="none" stroke="#FDE047" stroke-width="6" opacity="0.8" transform="rotate(-15 50 50)"/><circle cx="50" cy="50" r="28" fill="#EAB308"/></svg>`
+            },
+            {
+                id: 'uranus',
+                name: 'Uranus',
+                vnName: 'Thiên Vương Tinh',
+                type: 'Ice Giant',
+                category: 'gas',
+                color: '#22D3EE',
+                sizeRadius: 14,
+                orbitRadius: 265,
+                speed: 0.006,
+                temp: '-195°C',
+                moons: '28 Moons',
+                superpower: 'Spins Sideways on its Hip!',
+                desc: 'An ice giant that spins completely sideways on its side, like a rolling bowling ball flying through space!',
+                activity: 'Sideways Roll: Tilt your head all the way to your shoulder to roll sideways like Uranus!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="30" fill="#06B6D4"/><ellipse cx="50" cy="50" rx="8" ry="36" fill="none" stroke="#CFFAFE" stroke-width="3" opacity="0.6"/></svg>`
+            },
+            {
+                id: 'neptune',
+                name: 'Neptune',
+                vnName: 'Hải Vương Tinh',
+                type: 'Ice Giant',
+                category: 'gas',
+                color: '#2563EB',
+                sizeRadius: 13,
+                orbitRadius: 300,
+                speed: 0.004,
+                temp: '-200°C',
+                moons: '16 Moons',
+                superpower: '2,000 km/h Supersonic Winds!',
+                desc: 'The farthest planet! It has the wildest winds in the solar system (2,000 km/h)—7 TIMES faster than Earth’s most dangerous Category 5 hurricane!',
+                activity: 'Super Hurricane Sprint: Sprint in place as fast as possible to match Neptune’s supersonic winds!',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="30" fill="#1D4ED8"/><path d="M 25 45 Q 50 35 75 50" fill="none" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/></svg>`
+            }
+        ];
+
+        const QUIZ_QUESTIONS = [
+            {
+                q: "Does the Sun fly around the Earth?",
+                a: false,
+                explanation: "FALSE! Earth flies around the Sun once every year (365 days) while spinning like a top every day!"
+            },
+            {
+                q: "Is our Sun the biggest star/sun in the entire universe?",
+                a: false,
+                explanation: "FALSE! Our Sun is the biggest body in OUR solar system, but there are trillions of other stars in deep space much bigger than our Sun!"
+            },
+            {
+                q: "Are there other 'suns' out in space besides ours?",
+                a: true,
+                explanation: "TRUE! Almost every twinkling star you see in the night sky is another sun, and scientists estimate over 100 billion trillion of them exist!"
+            },
+            {
+                q: "Is Neptune's wind faster than the strongest hurricane on Earth?",
+                a: true,
+                explanation: "TRUE! Neptune's 2,000 km/h winds are 7 TIMES FASTER than the wildest Category 5 hurricane on Earth!"
+            },
+            {
+                q: "Can you walk on solid ground on Jupiter?",
+                a: false,
+                explanation: "FALSE! Jupiter is a Gas Giant with no solid ground—if you tried to stand on it, you would fall right through!"
+            },
+            {
+                q: "Is Mars super hot because it looks red?",
+                a: false,
+                explanation: "FALSE! Mars looks rusty red from iron dust, but it is actually a freezing cold planet with average temperatures of -63°C!"
+            }
+        ];
+
+        let orbitAnimId = null;
+        let orbitSpeedMultiplier = 1;
+        let isOrbitPaused = false;
+        let selectedPlanetIndex = null;
+
+        const canvas = document.getElementById('spaceCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Planet Angles state
+        const planetAngles = PLANETS_DATA.map(() => Math.random() * Math.PI * 2);
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
         }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            renderPlanetsGrid('all');
+            initCanvasEvents();
+            animateOrbit();
+        });
+
+        function animateOrbit() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = Math.min(centerX, centerY) - 20;
+            const scaleFactor = maxRadius / 320;
+
+            // Draw Stars in Background
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            for (let i = 0; i < 60; i++) {
+                const sx = (Math.sin(i * 99) * 0.5 + 0.5) * canvas.width;
+                const sy = (Math.cos(i * 33) * 0.5 + 0.5) * canvas.height;
+                const size = (i % 3) + 1;
+                ctx.beginPath();
+                ctx.arc(sx, sy, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Celestial Bodies
+            PLANETS_DATA.forEach((p, idx) => {
+                if (p.id === 'sun') {
+                    // Draw Sun
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, p.sizeRadius * scaleFactor, 0, Math.PI * 2);
+                    ctx.fillStyle = '#FBBF24';
+                    ctx.shadowColor = '#F59E0B';
+                    ctx.shadowBlur = 30;
+                    ctx.fill();
+                    ctx.restore();
+                } else {
+                    const radius = p.orbitRadius * scaleFactor;
+
+                    // Draw Orbit Ring
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    ctx.strokeStyle = idx === selectedPlanetIndex ? 'rgba(99, 102, 241, 0.8)' : 'rgba(255, 255, 255, 0.08)';
+                    ctx.lineWidth = idx === selectedPlanetIndex ? 2 : 1;
+                    ctx.stroke();
+
+                    // Update Angle
+                    if (!isOrbitPaused) {
+                        planetAngles[idx] += p.speed * orbitSpeedMultiplier;
+                    }
+
+                    // Calculate Planet Position
+                    const px = centerX + Math.cos(planetAngles[idx]) * radius;
+                    const py = centerY + Math.sin(planetAngles[idx]) * radius;
+
+                    // Store calculated coords for hover/click detection
+                    p.currentX = px;
+                    p.currentY = py;
+                    p.currentRadius = Math.max(p.sizeRadius * scaleFactor, 8);
+
+                    // Draw Saturn Ring if Saturn
+                    if (p.id === 'saturn') {
+                        ctx.beginPath();
+                        ctx.ellipse(px, py, p.currentRadius * 1.8, p.currentRadius * 0.6, -Math.PI / 6, 0, Math.PI * 2);
+                        ctx.strokeStyle = '#FDE047';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+                    }
+
+                    // Draw Planet Circle
+                    ctx.beginPath();
+                    ctx.arc(px, py, p.currentRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+
+                    // Highlight Ring if selected
+                    if (idx === selectedPlanetIndex) {
+                        ctx.beginPath();
+                        ctx.arc(px, py, p.currentRadius + 6, 0, Math.PI * 2);
+                        ctx.strokeStyle = '#6366F1';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            orbitAnimId = requestAnimationFrame(animateOrbit);
+        }
+
+        function initCanvasEvents() {
+            canvas.addEventListener('click', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                let found = false;
+                PLANETS_DATA.forEach((p, idx) => {
+                    if (p.id === 'sun') {
+                        const dist = Math.hypot(mx - canvas.width / 2, my - canvas.height / 2);
+                        if (dist < p.sizeRadius * 1.5) {
+                            showPlanetTooltip(p, idx);
+                            found = true;
+                        }
+                    } else {
+                        const dist = Math.hypot(mx - p.currentX, my - p.currentY);
+                        if (dist < p.currentRadius + 8) {
+                            showPlanetTooltip(p, idx);
+                            found = true;
+                        }
+                    }
+                });
+
+                if (!found) {
+                    hidePlanetTooltip();
+                }
+            });
+        }
+
+        function showPlanetTooltip(p, idx) {
+            selectedPlanetIndex = idx;
+            const tooltip = document.getElementById('canvas-planet-tooltip');
+            document.getElementById('tooltip-title').innerText = p.name;
+            document.getElementById('tooltip-tag').innerText = p.type;
+            document.getElementById('tooltip-desc').innerText = p.superpower;
+            document.getElementById('tooltip-btn').onclick = () => openPlanetModal(p.id);
+            tooltip.classList.remove('hidden');
+            playAudioBeep(600);
+        }
+
+        function hidePlanetTooltip() {
+            selectedPlanetIndex = null;
+            document.getElementById('canvas-planet-tooltip').classList.add('hidden');
+        }
+
+        function toggleOrbitAnimation() {
+            isOrbitPaused = !isOrbitPaused;
+            document.getElementById('pause-icon').className = isOrbitPaused ? 'fa-solid fa-play' : 'fa-solid fa-pause';
+            document.getElementById('pause-text').innerText = isOrbitPaused ? 'Resume' : 'Pause';
+        }
+
+        function setOrbitSpeed(val) {
+            orbitSpeedMultiplier = parseFloat(val);
+        }
+
+        function resetOrbitView() {
+            orbitSpeedMultiplier = 1;
+            document.getElementById('speed-range').value = 1;
+            isOrbitPaused = false;
+            document.getElementById('pause-icon').className = 'fa-solid fa-pause';
+            document.getElementById('pause-text').innerText = 'Pause';
+            hidePlanetTooltip();
+        }
+
+        const WIND_DATA = {
+            1: { title: "Category 5 Hurricane (Earth)", speed: "~280 km/h", icon: "fa-hurricane", color: "cyan", desc: "Wildest storm on Earth! Destroys buildings, but Neptune is 7 TIMES faster!" },
+            2: { title: "EF5 Tornado (Earth)", speed: "~500 km/h", icon: "fa-wind", color: "blue", desc: "Picks up cars on Earth. Neptune's winds are still 4 TIMES faster!" },
+            3: { title: "Japan Bullet Train", speed: "~320 km/h", icon: "fa-train-subway", color: "indigo", desc: "Fastest passenger train on Earth. Neptune's wind flies 6 TIMES faster!" },
+            4: { title: "Fighter Jet Speed", speed: "~1,200 km/h", icon: "fa-jet-fighter", color: "purple", desc: "Breaks the sound barrier! Neptune's wind is almost TWICE as fast!" },
+            5: { title: "NEPTUNE SUPER-STORM 🧊", speed: "2,000 KM/H", icon: "fa-bolt-lightning", color: "teal", desc: "SUPERSONIC ICE WINDS! Faster than a bullet train, jet, or Earth hurricane!" }
+        };
+
+        function updateWindComparison(val) {
+            const data = WIND_DATA[val];
+            document.getElementById('speed-label-val').innerText = `${data.title} (${data.speed})`;
+            document.getElementById('wind-title').innerText = data.title;
+            document.getElementById('wind-speed').innerText = data.speed;
+            document.getElementById('wind-desc').innerText = data.desc;
+            playAudioBeep(400 + val * 100);
+        }
+
+        function setStarComparison(mode) {
+            const container = document.getElementById('star-visual-container');
+            const leftObj = document.getElementById('star-obj-left');
+            const rightObj = document.getElementById('star-obj-right');
+            const nameLabel = document.getElementById('star-scale-name');
+            const btn1 = document.getElementById('btn-scale-1');
+            const btn2 = document.getElementById('btn-scale-2');
+
+            if (mode === 'earth-sun') {
+                nameLabel.innerText = "Earth vs. Our Sun";
+                leftObj.className = "w-2 h-2 rounded-full bg-blue-400 transition-all duration-500 flex items-center justify-center text-[8px] font-bold text-white";
+                leftObj.innerText = "";
+                rightObj.className = "w-24 h-24 rounded-full bg-amber-400 glow-sun transition-all duration-500 flex items-center justify-center text-xs font-bold text-slate-900";
+                rightObj.innerText = "Our Sun";
+                btn1.className = "py-1.5 px-3 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold transition";
+                btn2.className = "py-1.5 px-3 rounded-xl bg-space-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition";
+            } else {
+                nameLabel.innerText = "Our Sun vs. Stephenson 2-18 (Supergiant Star)";
+                leftObj.className = "w-2 h-2 rounded-full bg-amber-400 transition-all duration-500 flex items-center justify-center text-[8px] font-bold text-slate-950";
+                leftObj.innerText = "";
+                rightObj.className = "w-32 h-32 rounded-full bg-gradient-to-tr from-red-600 via-orange-500 to-yellow-400 glow-sun transition-all duration-500 flex items-center justify-center text-[10px] font-black text-white text-center p-1";
+                rightObj.innerText = "Supergiant Star (10 billion Suns!)";
+                btn1.className = "py-1.5 px-3 rounded-xl bg-space-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition";
+                btn2.className = "py-1.5 px-3 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold transition";
+            }
+            playAudioBeep(500);
+        }
+
+        function renderPlanetsGrid(filter) {
+            const grid = document.getElementById('planets-grid');
+            grid.innerHTML = '';
+
+            const list = PLANETS_DATA.filter(p => p.id !== 'sun' && (filter === 'all' || p.category === filter));
+
+            list.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "glass-card glass-card-hover rounded-2xl p-5 flex flex-col justify-between space-y-4 cursor-pointer";
+                card.onclick = () => openPlanetModal(p.id);
+
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-space-800 text-slate-400 border border-slate-700">${p.type}</span>
+                            <span class="text-xs font-mono font-bold text-amber-400">${p.temp}</span>
+                        </div>
+                        <div class="w-20 h-20 mx-auto py-1">
+                            ${p.svg}
+                        </div>
+                        <div class="text-center">
+                            <h3 class="font-display font-bold text-lg text-white">${p.name}</h3>
+                            <p class="text-xs text-indigo-400 font-medium">${p.vnName ? p.vnName : ''}</p>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed text-center line-clamp-2">${p.superpower}</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800 flex justify-between items-center text-xs text-slate-400 font-semibold">
+                        <span><i class="fa-solid fa-moon text-indigo-400 mr-1"></i> ${p.moons}</span>
+                        <span class="text-indigo-400 hover:text-indigo-300">Inspect <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterPlanets(cat) {
+            ['all', 'rocky', 'gas'].forEach(c => {
+                const btn = document.getElementById(`filter-${c}`);
+                if (c === cat) {
+                    btn.className = "px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold transition";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-xl bg-space-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition";
+                }
+            });
+            renderPlanetsGrid(cat);
+            playAudioBeep(450);
+        }
+
+        function openPlanetModal(id) {
+            const p = PLANETS_DATA.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('modal-planet-svg').innerHTML = p.svg;
+            document.getElementById('modal-planet-name').innerText = p.name;
+            document.getElementById('modal-planet-type').innerText = p.type;
+            document.getElementById('modal-planet-superpower').innerText = `⚡ Superpower: ${p.superpower}`;
+            document.getElementById('modal-planet-temp').innerText = p.temp;
+            document.getElementById('modal-planet-moons').innerText = p.moons;
+            document.getElementById('modal-planet-desc').innerText = p.desc;
+            document.getElementById('modal-planet-activity').innerText = p.activity;
+
+            const modal = document.getElementById('planet-modal');
+            modal.classList.remove('hidden');
+            playAudioBeep(700);
+        }
+
+        function closePlanetModal() {
+            document.getElementById('planet-modal').classList.add('hidden');
+        }
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+
+        function loadQuizQuestion() {
+            const q = QUIZ_QUESTIONS[currentQuizIndex];
+            document.getElementById('quiz-current-num').innerText = currentQuizIndex + 1;
+            document.getElementById('quiz-question-text').innerText = q.q;
+
+            document.getElementById('quiz-actions').classList.remove('hidden');
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+        }
+
+        function answerQuiz(userAns) {
+            const q = QUIZ_QUESTIONS[currentQuizIndex];
+            const isCorrect = userAns === q.a;
+
+            if (isCorrect) {
+                quizScore++;
+                document.getElementById('quiz-score').innerText = quizScore;
+                playAudioBeep(880);
+            } else {
+                playAudioBeep(220);
+            }
+
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.className = `p-4 rounded-xl text-center text-xs font-semibold leading-relaxed border ${
+                isCorrect ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/60 border-rose-500/40 text-rose-300'
+            }`;
+            feedback.innerHTML = `<strong>${isCorrect ? '🎉 Correct!' : '❌ Oops!'}</strong> ${q.explanation}`;
+
+            document.getElementById('quiz-actions').classList.add('hidden');
+            feedback.classList.remove('hidden');
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < QUIZ_QUESTIONS.length) {
+                loadQuizQuestion();
+            } else {
+                // Quiz Finish State
+                document.getElementById('quiz-question-text').innerHTML = `
+                    <div class="text-3xl mb-2">🏆</div>
+                    <div class="text-2xl font-black text-amber-400">Quiz Completed!</div>
+                    <p class="text-sm text-slate-300">You scored ${quizScore} out of ${QUIZ_QUESTIONS.length}!</p>
+                `;
+                document.getElementById('quiz-actions').classList.add('hidden');
+                document.getElementById('quiz-feedback').classList.add('hidden');
+
+                const nextBtn = document.getElementById('quiz-next-btn');
+                nextBtn.innerText = "Restart Quiz 🔄";
+                nextBtn.onclick = restartQuiz;
+                nextBtn.classList.remove('hidden');
+            }
+        }
+
+        function restartQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-score').innerText = 0;
+            document.getElementById('quiz-next-btn').onclick = nextQuizQuestion;
+            document.getElementById('quiz-next-btn').innerText = "Next Question →";
+            loadQuizQuestion();
+        }
+
+        function playAudioBeep(freq) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        function speakMnemonic() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const text = "My Very Entertaining Mother Just Served Us Nuggets!";
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Speech synth unavailable");
+            }
+        }
+
+        function triggerHurricaneSprint() {
+            playAudioBeep(300);
+            playAudioBeep(600);
+            playAudioBeep(900);
+            alert("🏃‍♂️ SPRINT TIME! Run in place as fast as you can for 10 seconds to match Neptune's 2,000 km/h winds!");
+        }
+
+        // Initialize Quiz on Load
+        loadQuizQuestion();
     </script>
 </body>
 </html>
